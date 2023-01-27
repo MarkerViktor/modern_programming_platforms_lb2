@@ -1,11 +1,12 @@
-FROM rust:1.66.1 as builder
+FROM node:12
 WORKDIR /app
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./src ./src
-COPY ./sqlx-data.json ./sqlx-data.json
-RUN cargo build --release
+COPY ./src ./
+COPY ./public ./
+COPY ./package*.json ./
+RUN npm install
+RUN npm run build
 
-FROM debian:buster-slim
-COPY --from=builder /app/target/release/rust_backend /etc/local/bin/rust_backend
-
-CMD ["rust_backend"]
+FROM nginx:latest
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/build /frontend
+EXPOSE 80
