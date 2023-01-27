@@ -1,0 +1,304 @@
+{
+  "db": "PostgreSQL",
+  "05537af27c57c62ce2e24afba19880e03acac7c726a3391709be5d2f08546abd": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select count(*) from posts"
+  },
+  "1ad5de1089bb452c946651058f8b2f9ab7d121b8af15214751e276bdfc9b7b6e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 1,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            insert into posts (text, image_url)\n            values ($1::text, $2::text)\n            returning id, created_at"
+  },
+  "3880472a9bd0bfb691420c7ce0c12af088b6e1e70f83ca746cac69fc0b495632": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_exist",
+          "ordinal": 0,
+          "type_info": "Bool"
+        },
+        {
+          "name": "post_exist",
+          "ordinal": 1,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n            select exists(select 0 from users as u where u.id = $1::integer) as user_exist,\n                   exists(select 0 from posts as p where p.id = $2::integer) as post_exist"
+  },
+  "512d43a29323b29f08e741f5915b184106c0b349f577804d1a199e3db0b3ccf6": {
+    "describe": {
+      "columns": [
+        {
+          "name": "post_id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "rate: RateKind",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "LIKE",
+                  "DISLIKE"
+                ]
+              },
+              "name": "ratekind"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4Array"
+        ]
+      }
+    },
+    "query": "\n            select\n                pr.post_id,\n                pr.rate as \"rate: RateKind\"\n            from post_rates as pr\n            join posts as p\n                on pr.post_id = p.id\n            join users as u\n                on pr.user_id = u.id\n            where pr.user_id = $1::integer\n                and pr.post_id = any($2::integer[])"
+  },
+  "5fd0598e5fd9f6c6ad94fe8b3289f4b9ba099bea6a69f6331f3a58c06fd1a77f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "rate: RateKind",
+          "ordinal": 0,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "LIKE",
+                  "DISLIKE"
+                ]
+              },
+              "name": "ratekind"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n            select rate as \"rate: RateKind\"\n            from post_rates as pr\n            where (pr.post_id, pr.user_id) = ($1::integer, $2::integer)"
+  },
+  "67a024733a6801b2214191ada4a0aa30616aca0ada42eef0d6f1278b30364d53": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            insert into user_auth (user_id, token)\n            values ($1::integer, $2::text)\n            on conflict (user_id) do update\n            set token = excluded.token"
+  },
+  "74dcbf2a911ee69b0888664026622421d7ec5c2b68e86d42792019a805faf8b6": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n            delete from user_auth as ua\n            where ua.user_id = $1::integer"
+  },
+  "81080ab08510cd6bb1c37305d8c338717531f158b5da8e0a2620542df5cb260c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "role: Role",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "ADMIN",
+                  "GUEST",
+                  "USER"
+                ]
+              },
+              "name": "role"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "\n            select uc.user_id, u.role as \"role: Role\"\n            from user_credentials as uc\n            join users as u\n                on u.id = uc.user_id\n            where (uc.login, uc.password_hash) = ($1::text, $2::bytea)"
+  },
+  "9d81c9eee253bf8ab49d3d47c1760e6be708c8374cd252808a32de4b0e6aaf74": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "ADMIN",
+                  "GUEST",
+                  "USER"
+                ]
+              },
+              "name": "role"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\n            insert into users (first_name, last_name, role)\n            values ($1::text, $2::text, $3::role) returning id"
+  },
+  "9e5ccd1557d871b81a0480b1f1ac1065ff508b8f08bfee3dbc0b73a850764d86": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Text",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "\n            insert into user_credentials (user_id, login, password_hash)\n            values ($1::integer, $2::text, $3::bytea)"
+  },
+  "d63ddd4a48d4351a485dfada54ec7ca422437567373fa3e26cbe6df01aecd500": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n            update posts\n            set likes_quantity = likes_quantity + $2::integer,\n                dislikes_quantity = dislikes_quantity + $3::integer\n            where id = $1::integer"
+  },
+  "fe41f31aee5a590136e5034c3059b55e8c2726b0a42a570afb8ec4bbf45ac842": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "role: Role",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "ADMIN",
+                  "GUEST",
+                  "USER"
+                ]
+              },
+              "name": "role"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            select\n                u.id as user_id,\n                u.role as \"role: Role\"\n            from user_auth as ua\n            join users as u\n                on ua.user_id = u.id\n            where ua.token = $1::text"
+  }
+}
