@@ -4,7 +4,7 @@ pub mod image_storage;
 use derive_more::From;
 use sqlx::{query, query_as, Error, Pool, Postgres};
 use std::collections::HashMap;
-use std::ops::Not;
+use std::ops::DerefMut;
 
 use crate::services::posts::entities::{Post, PostsListConfig, PostsListOrder, RateKind};
 use crate::services::posts::image_storage::{ImageStorage, SaveImageError};
@@ -121,23 +121,25 @@ impl PostsService {
         new_rate: Option<RateKind>,
     ) -> Result<(), UpdateRateError> {
         // check user_id and post_id exists
+
         let mut transaction = self.db.begin().await?;
 
         let check = query!(
             r"
-            select exists(select 0 from users as u where u.id = $1::integer) as user_exist,
-                   exists(select 0 from posts as p where p.id = $2::integer) as post_exist
+            select exists(select 0 from users as u where u.id = $1::integer)::boolean as user_exist,
+                   exists(select 0 from posts as p where p.id = $2::integer)::boolean as post_exist
             ",
             user_id,
             post_id,
         )
-        .fetch_one(&mut transaction)
+        .fetch_one(transaction.deref_mut())
         .await?;
-        if check.user_exist.unwrap().not() {
-            return Err(UpdateRateError::UnknownUserIdError);
+
+        if !check.user_exist.unwrap() {
+            return Err(UpdateRateError::UnknownUserId);
         }
-        if check.post_exist.unwrap().not() {
-            return Err(UpdateRateError::UnknownPostIdError);
+        if !check.post_exist.unwrap() {
+            return Err(UpdateRateError::UnknownPostId);
         }
 
         // Get old rate.
@@ -150,7 +152,7 @@ impl PostsService {
             post_id,
             user_id,
         )
-        .fetch_optional(&mut transaction)
+        .fetch_optional(transaction.deref_mut())
         .await?;
         let old_rate: Option<RateKind> = match record {
             Some(record) => Some(record.rate),
@@ -190,7 +192,7 @@ impl PostsService {
             likes,
             dislikes,
         )
-        .execute(&mut transaction)
+        .execute(transaction.deref_mut())
         .await?;
 
         // Create, update or delete user's post reaction.
@@ -199,7 +201,7 @@ impl PostsService {
                 query!(
                     r"
                     insert into post_rates (post_id, user_id, rate)
-                    values ($1::integer, $2::integer, $3::ratekind)
+                    values ($1::integer, $2::integer, $3::rate_kind_t)
                     on conflict (post_id, user_id) do update
                     set rate = excluded.rate
                     ",
@@ -207,7 +209,7 @@ impl PostsService {
                     user_id,
                     new_rate as RateKind,
                 )
-                .execute(&mut transaction)
+                .execute(transaction.deref_mut())
                 .await?
             }
             None => {
@@ -217,7 +219,7 @@ impl PostsService {
                     where pr.user_id = $1",
                     user_id,
                 )
-                .execute(&mut transaction)
+                .execute(transaction.deref_mut())
                 .await?
             }
         };
@@ -250,7 +252,8 @@ pub enum CreatePostError {
 
 #[derive(Debug, From)]
 pub enum UpdateRateError {
-    UnknownUserIdError,
-    UnknownPostIdError,
-    DbError(Error),
+    UnknownUserId,
+    UnknownPostId,
+    Db(Error),
 }
+

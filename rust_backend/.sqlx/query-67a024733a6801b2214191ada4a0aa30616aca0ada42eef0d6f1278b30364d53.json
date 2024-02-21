@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            insert into user_auth (user_id, token)\n            values ($1::integer, $2::text)\n            on conflict (user_id) do update\n            set token = excluded.token",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "67a024733a6801b2214191ada4a0aa30616aca0ada42eef0d6f1278b30364d53"
+}

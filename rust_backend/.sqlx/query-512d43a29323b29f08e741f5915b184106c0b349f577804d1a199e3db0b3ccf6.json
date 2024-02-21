@@ -1,0 +1,39 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            select\n                pr.post_id,\n                pr.rate as \"rate: RateKind\"\n            from post_rates as pr\n            join posts as p\n                on pr.post_id = p.id\n            join users as u\n                on pr.user_id = u.id\n            where pr.user_id = $1::integer\n                and pr.post_id = any($2::integer[])",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "post_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "rate: RateKind",
+        "type_info": {
+          "Custom": {
+            "name": "rate_kind_t",
+            "kind": {
+              "Enum": [
+                "LIKE",
+                "DISLIKE"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "512d43a29323b29f08e741f5915b184106c0b349f577804d1a199e3db0b3ccf6"
+}

@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use actix_session::{Session, SessionExt};
+use actix_session::{SessionExt};
 use actix_web::{web, HttpRequest};
 use derive_more::From;
 

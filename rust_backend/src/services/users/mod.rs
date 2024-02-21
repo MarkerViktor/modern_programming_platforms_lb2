@@ -1,5 +1,6 @@
 pub mod entities;
 
+use std::ops::DerefMut;
 use crate::services::auth::{AuthService, CreateCredentialsError};
 use crate::services::users::entities::Role;
 use actix_web::web::Data;
@@ -25,13 +26,13 @@ impl UsersService {
         let user = query!(
             r#"
             insert into users (first_name, last_name, role)
-            values ($1::text, $2::text, $3::role) returning id
+            values ($1::text, $2::text, $3::user_role_t) returning id
             "#,
             &first_name,
             &last_name,
             Role::User as Role,
         )
-        .fetch_one(&mut transaction)
+        .fetch_one(transaction.deref_mut())
         .await?;
 
         self.auth_service

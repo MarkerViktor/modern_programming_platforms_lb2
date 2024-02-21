@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            select uc.user_id, u.role as \"role: Role\"\n            from user_credentials as uc\n            join users as u\n                on u.id = uc.user_id\n            where (uc.login, uc.password_hash) = ($1::text, $2::bytea)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "role: Role",
+        "type_info": {
+          "Custom": {
+            "name": "user_role_t",
+            "kind": {
+              "Enum": [
+                "ADMIN",
+                "GUEST",
+                "USER"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Bytea"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "81080ab08510cd6bb1c37305d8c338717531f158b5da8e0a2620542df5cb260c"
+}

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    delete from post_rates as pr\n                    where pr.user_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0bffb903f25afaa94c4699cf3ad5f893864efa634092084c493fba549817ba2e"
+}

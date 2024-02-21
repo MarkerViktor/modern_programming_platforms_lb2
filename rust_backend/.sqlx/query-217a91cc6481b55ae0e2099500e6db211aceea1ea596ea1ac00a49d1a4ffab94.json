@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    insert into post_rates (post_id, user_id, rate)\n                    values ($1::integer, $2::integer, $3::rate_kind_t)\n                    on conflict (post_id, user_id) do update\n                    set rate = excluded.rate\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        {
+          "Custom": {
+            "name": "rate_kind_t",
+            "kind": {
+              "Enum": [
+                "LIKE",
+                "DISLIKE"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "217a91cc6481b55ae0e2099500e6db211aceea1ea596ea1ac00a49d1a4ffab94"
+}

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            delete from user_auth as ua\n            where ua.user_id = $1::integer",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "74dcbf2a911ee69b0888664026622421d7ec5c2b68e86d42792019a805faf8b6"
+}

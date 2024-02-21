@@ -1,0 +1,39 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            select\n                u.id as user_id,\n                u.role as \"role: Role\"\n            from user_auth as ua\n            join users as u\n                on ua.user_id = u.id\n            where ua.token = $1::text",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "role: Role",
+        "type_info": {
+          "Custom": {
+            "name": "user_role_t",
+            "kind": {
+              "Enum": [
+                "ADMIN",
+                "GUEST",
+                "USER"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "fe41f31aee5a590136e5034c3059b55e8c2726b0a42a570afb8ec4bbf45ac842"
+}

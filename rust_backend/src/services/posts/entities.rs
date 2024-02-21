@@ -50,7 +50,7 @@ pub struct Post {
 
 /// Пользовательская оценка поста
 #[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone, Copy, PartialEq)]
-#[sqlx(type_name = "ratekind")]
+#[sqlx(type_name = "rate_kind_t")]
 #[sqlx(rename_all = "UPPERCASE")]
 pub enum RateKind {
     #[serde(rename = "like")]

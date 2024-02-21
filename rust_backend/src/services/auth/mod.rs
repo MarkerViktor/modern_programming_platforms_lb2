@@ -1,3 +1,4 @@
+use std::ops::DerefMut;
 use derive_more::From;
 use serde::Serialize;
 use sqlx::{query, query_as, Error, Pool, Postgres, Transaction};
@@ -105,7 +106,7 @@ impl AuthService {
             &login,
             &password_hash,
         )
-        .execute(transaction)
+        .execute(transaction.deref_mut())
         .await
         .map_err(|err| match err {
             Error::Database(err) => match err.code().unwrap().as_ref() {

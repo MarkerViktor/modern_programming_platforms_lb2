@@ -1,13 +1,14 @@
 version: "3.9"
 services:
   database:
-    image: postgres:latest
+    image: postgres:16.1-alpine
     environment:
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "user"
       POSTGRES_PASSWORD: "password"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+      - ./migration.sql:/docker-entrypoint-initdb.d/migration.sql
     ports:
       - "6432:5432"
     expose:
@@ -15,10 +16,18 @@ services:
 
   frontend:
     build: ./frontend
+    environment:
+      HOST: "markerweb.local"
+      PORT: "80"
+      BACKEND_HOST: "backend"
+      BACKEND_PORT: "8080"
     volumes:
       - ./storage:/storage:ro
     ports:
       - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
 
   backend:
     build: ./rust_backend
@@ -26,6 +35,7 @@ services:
       RUST_LOG: "info"
       DATABASE_URL: "postgresql://user:password@database:5432/postgres"
       COOKIE_KEY: "5QBj3KjxcD7pgI8r5QBj3KjxcD7pgI8r5QBj3KjxcD7pgI8r5QBj3KjxcD7pgI8r"
+      COOKIE_DOMAIN: "markerweb.local"
       PASSWORD_HASH_SALT: "fhasdkjkfjdjnfaosdhj"
       ADDRESS: "0.0.0.0:8080"
       STORAGE_PATH: "/storage"
@@ -33,6 +43,6 @@ services:
       - ./storage:/storage
     expose:
       - "8080"
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - database

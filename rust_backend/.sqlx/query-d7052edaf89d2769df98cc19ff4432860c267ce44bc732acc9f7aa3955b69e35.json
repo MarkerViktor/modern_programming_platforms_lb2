@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            update posts\n            set likes_quantity = likes_quantity + $2::integer,\n                dislikes_quantity = dislikes_quantity + $3::integer\n            where id = $1::integer\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d7052edaf89d2769df98cc19ff4432860c267ce44bc732acc9f7aa3955b69e35"
+}

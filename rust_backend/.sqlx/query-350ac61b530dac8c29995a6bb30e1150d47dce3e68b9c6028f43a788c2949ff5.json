@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            select rate as \"rate: RateKind\"\n            from post_rates as pr\n            where (pr.post_id, pr.user_id) = ($1::integer, $2::integer)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "rate: RateKind",
+        "type_info": {
+          "Custom": {
+            "name": "rate_kind_t",
+            "kind": {
+              "Enum": [
+                "LIKE",
+                "DISLIKE"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "350ac61b530dac8c29995a6bb30e1150d47dce3e68b9c6028f43a788c2949ff5"
+}

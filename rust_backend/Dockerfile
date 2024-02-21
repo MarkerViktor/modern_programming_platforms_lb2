@@ -1,11 +1,21 @@
-FROM rust:1.66.1 as builder
+FROM rust:1.76.0 as builder
+
+RUN cargo new /app
 WORKDIR /app
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./src ./src
-COPY ./sqlx-data.json ./sqlx-data.json
+
+COPY ./Cargo.toml ./Cargo.lock ./
 RUN cargo build --release
 
-FROM debian:buster-slim
-COPY --from=builder /app/target/release/rust_backend /etc/local/bin/rust_backend
+COPY ./src ./src
+COPY ./.sqlx ./.sqlx
+RUN cargo clean -p rust_backend
+RUN SQLX_OFFLINE=true cargo build --release
 
-CMD ["rust_backend"]
+
+FROM debian:bookworm-slim
+
+WORKDIR /app
+COPY --from=builder /app/target/release/rust_backend ./
+
+EXPOSE 8080
+CMD ["./rust_backend"]

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            insert into user_credentials (user_id, login, password_hash)\n            values ($1::integer, $2::text, $3::bytea)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text",
+        "Bytea"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9e5ccd1557d871b81a0480b1f1ac1065ff508b8f08bfee3dbc0b73a850764d86"
+}

@@ -1,10 +1,9 @@
-import axios, { Axios, AxiosError } from 'axios'
-import { useAuthContext } from './Components/Main/Auth'
+import axios from 'axios'
 
 
 export class BackendClient {
     client = axios.create({
-        baseURL: 'http://api.localhost/',
+        baseURL: '/api/',
         headers: {
             'Accept': 'application/json',
         },
@@ -44,8 +43,7 @@ export class BackendClient {
         const formData = new FormData()
         formData.append('image', imageBlob)
         formData.append('text', text)
-
-        const response = await this.client.post('/posts', formData)
+        await this.client.post('/posts', formData)
     }
 
     async setReactionToPost(postId, reaction) {

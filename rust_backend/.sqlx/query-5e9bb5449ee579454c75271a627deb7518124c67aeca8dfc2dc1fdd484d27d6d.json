@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            select exists(select 0 from users as u where u.id = $1::integer)::boolean as user_exist,\n                   exists(select 0 from posts as p where p.id = $2::integer)::boolean as post_exist\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_exist",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "post_exist",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "5e9bb5449ee579454c75271a627deb7518124c67aeca8dfc2dc1fdd484d27d6d"
+}
